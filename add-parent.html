@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Manage Parents — Advik Learning Centre</title>
+  <meta name="robots" content="noindex" />
+  <meta name="theme-color" content="#3a2414" />
+  <link rel="icon" href="assets/advik-logo.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Lora:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="container nav">
+      <a class="brand" href="index.html">
+        <img src="assets/advik-logo.png" alt="Advik Learning Centre logo" />
+        <span class="brand-text"><strong>ADVIK</strong><small>Admin Panel</small></span>
+      </a>
+      <nav class="nav-links">
+        <a href="admin.html">Marks</a>
+        <a href="add-student.html">Students</a>
+        <a href="add-parent.html" class="active">Parents</a>
+        <a href="index.html">Website</a>
+        <a href="#" id="logout">Log out</a>
+      </nav>
+    </div>
+  </header>
+
+  <section class="section">
+    <div class="container">
+      <div class="portal">
+        <div id="loading" class="spinner">Checking access…</div>
+
+        <div id="denied" class="hidden">
+          <div class="alert alert--error">Access denied. This page is for administrators only.</div>
+          <a href="parent-login.html" class="btn btn--ghost">Go to login</a>
+        </div>
+
+        <div id="content" class="hidden">
+          <div class="portal-head">
+            <div>
+              <span class="section-kicker" style="text-align:left;">Administration</span>
+              <h1>Manage Parents</h1>
+              <p class="muted">Link parent accounts to students, or edit and remove them.</p>
+            </div>
+            <a href="admin.html" class="btn btn--ghost">← Back to Marks</a>
+          </div>
+
+          <div id="msg"></div>
+
+          <div class="admin-main">
+
+            <!-- LEFT: Link parent -->
+            <div class="card admin-card">
+              <h3>Add a Parent Account</h3>
+              <p style="color:var(--muted); font-size:0.88rem; margin-bottom:1rem;">
+                First create the parent's login in Firebase Console → Authentication → Add user, then paste their <b>User UID</b> here to link them to a student.
+              </p>
+              <form id="link-form">
+                <div class="field"><label>Parent's User UID *</label><input type="text" id="l-uid" required placeholder="paste UID from Authentication" /></div>
+                <div class="field"><label>Parent's name</label><input type="text" id="l-name" placeholder="e.g. Mr. Sharma" /></div>
+                <div class="field"><label>Parent's phone</label><input type="tel" id="l-phone" placeholder="10-digit mobile number" /></div>
+                <div class="field">
+                  <label>Link to student *</label>
+                  <select id="l-student" required><option value="" disabled selected>Select student</option></select>
+                </div>
+                <button class="btn btn--primary" style="width:100%; justify-content:center;">Link Parent</button>
+              </form>
+            </div>
+
+            <!-- RIGHT: Parents list -->
+            <div class="card admin-card">
+              <h3>Linked Parents</h3>
+              <div class="table-wrap">
+                <table class="table">
+                  <thead><tr><th>Parent</th><th>Student</th><th></th></tr></thead>
+                  <tbody id="parents-body"><tr><td colspan="3" class="muted">Loading…</td></tr></tbody>
+                </table>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Edit Parent modal -->
+  <div class="modal-overlay" id="modal-edit-parent">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="ep-title">
+      <div class="modal-head">
+        <div><h3 id="ep-title">Edit Parent</h3><p>Update the parent's name or which student they're linked to.</p></div>
+        <button type="button" class="modal-close" data-close aria-label="Close">&times;</button>
+      </div>
+      <form id="edit-parent-form">
+        <input type="hidden" id="ep-uid" />
+        <div class="field"><label>Parent's name</label><input type="text" id="ep-name" placeholder="e.g. Mr. Sharma" /></div>
+        <div class="field"><label>Parent's phone</label><input type="tel" id="ep-phone" placeholder="10-digit mobile number" /></div>
+        <div class="field">
+          <label>Linked student *</label>
+          <select id="ep-student" required></select>
+        </div>
+        <button class="btn btn--primary" style="width:100%; justify-content:center;">Save Changes</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- View Parent details modal -->
+  <div class="modal-overlay" id="modal-view-parent">
+    <div class="modal" style="max-width:420px;" role="dialog" aria-modal="true">
+      <div class="modal-head">
+        <div><h3>Parent Details</h3></div>
+        <button type="button" class="modal-close" data-close aria-label="Close">&times;</button>
+      </div>
+      <dl class="detail-list">
+        <div><dt>Name</dt><dd id="v-name">—</dd></div>
+        <div><dt>Phone</dt><dd id="v-phone">—</dd></div>
+        <div><dt>Student</dt><dd id="v-student">—</dd></div>
+      </dl>
+      <div style="display:flex; gap:0.7rem; justify-content:flex-end; margin-top:1.2rem;">
+        <button type="button" class="btn btn--ghost" data-close>Close</button>
+        <button type="button" class="btn btn--primary" id="v-edit">Edit</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Confirm delete modal -->
+  <div class="modal-overlay" id="modal-confirm">
+    <div class="modal" style="max-width:400px;" role="dialog" aria-modal="true">
+      <div class="modal-head">
+        <div><h3>Please confirm</h3><p id="cf-msg"></p></div>
+        <button type="button" class="modal-close" data-close aria-label="Close">&times;</button>
+      </div>
+      <div style="display:flex; gap:0.7rem; justify-content:flex-end;">
+        <button type="button" class="btn btn--ghost" data-close>Cancel</button>
+        <button type="button" class="btn btn--danger" id="cf-ok">Delete</button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { auth, db } from "./js/firebase-config.js";
+    import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import {
+      doc, getDoc, setDoc, updateDoc, deleteDoc, collection, getDocs
+    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+    const loading = document.getElementById("loading");
+    const content = document.getElementById("content");
+    const denied = document.getElementById("denied");
+    const msg = document.getElementById("msg");
+    let students = [];
+    let parents = [];
+
+    function logout(e){ if(e) e.preventDefault(); signOut(auth).then(function(){ window.location.replace("parent-login.html"); }); }
+    document.getElementById("logout").addEventListener("click", logout);
+
+    function flash(text, type){
+      msg.innerHTML = '<div class="alert alert--' + type + '">' + text + '</div>';
+      msg.scrollIntoView({ behavior: "smooth", block: "nearest" });
+      if (type === "ok") setTimeout(function(){ msg.innerHTML = ""; }, 4000);
+    }
+    function esc(v){ return String(v==null?"":v).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];}); }
+
+    const ICON_EDIT = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg>';
+    const ICON_DEL = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/></svg>';
+
+    function studentOptionsHtml(selectedId) {
+      return '<option value="" disabled' + (selectedId ? '' : ' selected') + '>Select student</option>' +
+        students.map(function (s) {
+          return '<option value="' + s.id + '"' + (s.id === selectedId ? ' selected' : '') + '>' +
+                 esc(s.name) + (s.class ? " (Class " + esc(s.class) + ")" : "") + '</option>';
+        }).join("");
+    }
+
+    // Modals
+    function openModal(id){ document.getElementById(id).classList.add("open"); document.body.classList.add("modal-open"); }
+    function closeModal(el){ if (el) el.classList.remove("open"); if (!document.querySelector(".modal-overlay.open")) document.body.classList.remove("modal-open"); }
+    document.querySelectorAll(".modal-overlay").forEach(function(ov){ ov.addEventListener("click", function(e){ if (e.target === ov) closeModal(ov); }); });
+    document.querySelectorAll("[data-close]").forEach(function(b){ b.addEventListener("click", function(){ closeModal(b.closest(".modal-overlay")); }); });
+    document.addEventListener("keydown", function(e){ if (e.key === "Escape") document.querySelectorAll(".modal-overlay.open").forEach(closeModal); });
+
+    let pendingConfirm = null;
+    function askConfirm(message, fn){ document.getElementById("cf-msg").textContent = message; pendingConfirm = fn; openModal("modal-confirm"); }
+    document.getElementById("cf-ok").addEventListener("click", async function(){
+      const fn = pendingConfirm; pendingConfirm = null;
+      closeModal(document.getElementById("modal-confirm"));
+      if (fn) await fn();
+    });
+
+    onAuthStateChanged(auth, async function (user) {
+      if (!user) { window.location.replace("parent-login.html"); return; }
+      try {
+        const snap = await getDoc(doc(db, "users", user.uid));
+        if (!snap.exists() || snap.data().role !== "admin") {
+          loading.classList.add("hidden"); denied.classList.remove("hidden"); return;
+        }
+        loading.classList.add("hidden"); content.classList.remove("hidden");
+        await loadStudents();
+        await loadParents();
+      } catch (err) {
+        loading.classList.add("hidden"); denied.classList.remove("hidden"); console.error(err);
+      }
+    });
+
+    async function loadStudents() {
+      const snap = await getDocs(collection(db, "students"));
+      students = [];
+      snap.forEach(function (d) { students.push(Object.assign({ id: d.id }, d.data())); });
+      students.sort(function(a,b){ return (a.name||"").localeCompare(b.name||""); });
+      document.getElementById("l-student").innerHTML = studentOptionsHtml();
+    }
+
+    async function loadParents() {
+      const snap = await getDocs(collection(db, "users"));
+      const nameById = {};
+      students.forEach(function (s) { nameById[s.id] = s.name; });
+      parents = [];
+      snap.forEach(function (d) { const u = d.data(); if (u.role === "parent") parents.push(Object.assign({ uid: d.id }, u)); });
+      parents.sort(function (a, b) { return (a.name || "").localeCompare(b.name || ""); });
+      const body = document.getElementById("parents-body");
+      body.innerHTML = parents.length
+        ? parents.map(function (p) {
+            return '<tr><td><button class="row-link" data-view="' + p.uid + '">' + esc(p.name || "—") + "</button></td>" +
+                   "<td>" + esc(nameById[p.studentId] || p.studentId || "—") +
+                   '</td><td class="cell-action"><button class="tbl-edit" data-edit="' + p.uid + '" title="Edit" aria-label="Edit">' + ICON_EDIT + '</button>' +
+                   '<button class="tbl-del" data-del="' + p.uid + '" title="Delete" aria-label="Delete">' + ICON_DEL + '</button></td></tr>';
+          }).join("")
+        : '<tr><td colspan="3" class="muted">No parents linked yet.</td></tr>';
+    }
+
+    // Link parent
+    document.getElementById("link-form").addEventListener("submit", async function (e) {
+      e.preventDefault();
+      try {
+        const uid = document.getElementById("l-uid").value.trim();
+        await setDoc(doc(db, "users", uid), {
+          role: "parent",
+          name: document.getElementById("l-name").value.trim(),
+          phone: document.getElementById("l-phone").value.trim(),
+          studentId: document.getElementById("l-student").value
+        }, { merge: true });
+        e.target.reset();
+        flash("Parent linked successfully.", "ok");
+        await loadParents();
+      } catch (err) { flash("Could not link parent: " + err.message, "error"); }
+    });
+
+    // View / Edit / Delete (delegated)
+    let currentViewUid = null;
+    document.getElementById("parents-body").addEventListener("click", function (e) {
+      const view = e.target.closest("[data-view]");
+      const edit = e.target.closest("[data-edit]");
+      const del = e.target.closest("[data-del]");
+      if (view) openView(view.getAttribute("data-view"));
+      else if (edit) openEdit(edit.getAttribute("data-edit"));
+      else if (del) confirmDelete(del.getAttribute("data-del"));
+    });
+
+    function openView(uid) {
+      const p = parents.find(function (x) { return x.uid === uid; });
+      if (!p) return;
+      currentViewUid = uid;
+      const s = students.find(function (x) { return x.id === p.studentId; });
+      document.getElementById("v-name").textContent = p.name || "—";
+      document.getElementById("v-phone").textContent = p.phone || "—";
+      document.getElementById("v-student").textContent = s ? (s.name + (s.class ? " (Class " + s.class + ")" : "")) : (p.studentId || "—");
+      openModal("modal-view-parent");
+    }
+    document.getElementById("v-edit").addEventListener("click", function () {
+      const uid = currentViewUid;
+      closeModal(document.getElementById("modal-view-parent"));
+      openEdit(uid);
+    });
+
+    function openEdit(uid) {
+      const p = parents.find(function (x) { return x.uid === uid; });
+      if (!p) return;
+      document.getElementById("ep-uid").value = p.uid;
+      document.getElementById("ep-name").value = p.name || "";
+      document.getElementById("ep-phone").value = p.phone || "";
+      document.getElementById("ep-student").innerHTML = studentOptionsHtml(p.studentId);
+      openModal("modal-edit-parent");
+    }
+
+    function confirmDelete(uid) {
+      const p = parents.find(function (x) { return x.uid === uid; });
+      askConfirm('Remove parent "' + (p ? p.name : "") + '"? This unlinks them from the student. (Their login still exists in Firebase Authentication — delete it there too if needed.)', async function () {
+        try {
+          await deleteDoc(doc(db, "users", uid));
+          flash("Parent removed.", "ok");
+          await loadParents();
+        } catch (err) { flash("Could not remove parent: " + err.message, "error"); }
+      });
+    }
+
+    // Save edited parent
+    document.getElementById("edit-parent-form").addEventListener("submit", async function (e) {
+      e.preventDefault();
+      try {
+        const uid = document.getElementById("ep-uid").value;
+        await updateDoc(doc(db, "users", uid), {
+          name: document.getElementById("ep-name").value.trim(),
+          phone: document.getElementById("ep-phone").value.trim(),
+          studentId: document.getElementById("ep-student").value
+        });
+        closeModal(document.getElementById("modal-edit-parent"));
+        flash("Parent updated.", "ok");
+        await loadParents();
+      } catch (err) { flash("Could not update parent: " + err.message, "error"); }
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>My Dashboard — Advik Learning Centre</title>
+  <meta name="robots" content="noindex" />
+  <meta name="theme-color" content="#3a2414" />
+  <link rel="icon" href="assets/advik-logo.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Lora:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="container nav">
+      <a class="brand" href="index.html">
+        <img src="assets/advik-logo.png" alt="Advik Learning Centre logo" />
+        <span class="brand-text"><strong>ADVIK</strong><small>Learning Centre</small></span>
+      </a>
+      <nav class="nav-links">
+        <a href="index.html">Website</a>
+        <a href="#" id="logout">Log out</a>
+      </nav>
+    </div>
+  </header>
+
+  <section class="section">
+    <div class="container">
+      <div class="portal">
+
+        <!-- Loading -->
+        <div id="loading" class="spinner">Loading your dashboard…</div>
+
+        <!-- Content -->
+        <div id="content" class="hidden">
+          <div class="portal-head">
+            <div>
+              <span class="section-kicker" style="text-align:left;">Parent Portal</span>
+              <h1 id="welcome">Welcome</h1>
+              <p class="muted" id="student-meta"></p>
+            </div>
+            <a href="#" id="logout-btn" class="btn btn--ghost">Log out</a>
+          </div>
+
+          <div id="admin-link"></div>
+
+          <h2 style="font-size:1.3rem; margin-bottom:1rem;">Marks &amp; Assessments</h2>
+          <div id="marks-area">
+            <div class="table-wrap">
+              <table class="table">
+                <thead>
+                  <tr><th>Date</th><th>Test</th><th>Subject</th><th>Score</th></tr>
+                </thead>
+                <tbody id="marks-body"></tbody>
+              </table>
+            </div>
+          </div>
+          <div id="no-marks" class="hidden">
+            <div class="alert alert--info">No marks have been uploaded yet. Please check back soon.</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <script type="module">
+    import { auth, db } from "./js/firebase-config.js";
+    import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import {
+      doc, getDoc, collection, query, where, getDocs
+    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+    const loading = document.getElementById("loading");
+    const content = document.getElementById("content");
+
+    function logout(e) { if (e) e.preventDefault(); signOut(auth).then(function(){ window.location.replace("parent-login.html"); }); }
+    document.getElementById("logout").addEventListener("click", logout);
+    document.getElementById("logout-btn").addEventListener("click", logout);
+
+    onAuthStateChanged(auth, async function (user) {
+      if (!user) { window.location.replace("parent-login.html"); return; }
+
+      try {
+        // 1) Load this user's profile (role + linked studentId)
+        const userSnap = await getDoc(doc(db, "users", user.uid));
+        if (!userSnap.exists()) {
+          showError("Your account isn't linked to a student yet. Please contact Advik Learning Centre.");
+          return;
+        }
+        const profile = userSnap.data();
+
+        // Admins don't use the parent dashboard — send them straight to the admin panel.
+        if (profile.role === "admin") { window.location.replace("admin.html"); return; }
+
+        const studentId = profile.studentId;
+        document.getElementById("welcome").textContent = "Welcome, " + (profile.name || "Parent");
+
+        if (!studentId) {
+          showError("No student is linked to your account yet. Please contact the centre.");
+          return;
+        }
+
+        // 2) Load the student details
+        const studentSnap = await getDoc(doc(db, "students", studentId));
+        if (studentSnap.exists()) {
+          const s = studentSnap.data();
+          document.getElementById("student-meta").textContent =
+            "Student: " + (s.name || "—") + (s.class ? "  ·  Class " + s.class : "") +
+            (s.rollNo ? "  ·  Roll " + s.rollNo : "") + (s.course ? "  ·  " + s.course : "");
+        }
+
+        // 3) Load marks for this student (sorted newest-first, client side)
+        const q = query(collection(db, "marks"), where("studentId", "==", studentId));
+        const marksSnap = await getDocs(q);
+        const rows = [];
+        marksSnap.forEach(function (d) { rows.push(d.data()); });
+        rows.sort(function (a, b) { return (b.date || "").localeCompare(a.date || ""); });
+
+        const body = document.getElementById("marks-body");
+        if (rows.length === 0) {
+          document.getElementById("marks-area").classList.add("hidden");
+          document.getElementById("no-marks").classList.remove("hidden");
+        } else {
+          body.innerHTML = rows.map(function (m) {
+            const score = (m.obtained != null ? m.obtained : "—") + (m.max != null ? " / " + m.max : "");
+            return "<tr><td>" + esc(m.date) + "</td><td>" + esc(m.testName) +
+                   "</td><td>" + esc(m.subject) + '</td><td class="score">' + esc(score) + "</td></tr>";
+          }).join("");
+        }
+        reveal();
+      } catch (err) {
+        showError("Something went wrong loading your dashboard. Please try again later.");
+        console.error(err);
+      }
+    });
+
+    function reveal() { loading.classList.add("hidden"); content.classList.remove("hidden"); }
+    function showError(text) {
+      loading.classList.add("hidden");
+      content.classList.remove("hidden");
+      content.innerHTML = '<div class="alert alert--error">' + text + '</div>' +
+        '<a href="#" class="btn btn--ghost" onclick="return false" id="lo2">Log out</a>';
+      document.getElementById("lo2").addEventListener("click", logout);
+    }
+    function esc(v) {
+      return String(v == null ? "" : v).replace(/[&<>"']/g, function (c) {
+        return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+      });
+    }
+  </script>
+</body>
+</html>

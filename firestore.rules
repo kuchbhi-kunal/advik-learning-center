@@ -1,0 +1,49 @@
+rules_version = '2';
+
+// ============================================================
+// Firestore security rules for the Advik parent portal.
+// Paste these into: Firebase Console → Firestore Database → Rules → Publish.
+//
+// What they enforce:
+//   • A parent can read ONLY their own linked child's marks.
+//   • Only an admin can create students, enter marks, or link parents.
+//   • Nobody can read another family's data, even by tampering with the page.
+// ============================================================
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() {
+      return request.auth != null;
+    }
+    function userData() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data;
+    }
+    function isAdmin() {
+      return signedIn()
+        && exists(/databases/$(database)/documents/users/$(request.auth.uid))
+        && userData().role == 'admin';
+    }
+    function myStudentId() {
+      return userData().studentId;
+    }
+
+    // User profiles: a user reads their own; admins read/write all.
+    match /users/{uid} {
+      allow read:  if signedIn() && (request.auth.uid == uid || isAdmin());
+      allow write: if isAdmin();
+    }
+
+    // Students: any signed-in user may read; only admins may write.
+    match /students/{id} {
+      allow read:  if signedIn();
+      allow write: if isAdmin();
+    }
+
+    // Marks: admin reads all; a parent reads only their own child's marks.
+    match /marks/{id} {
+      allow read:   if isAdmin() || (signedIn() && resource.data.studentId == myStudentId());
+      allow create, update, delete: if isAdmin();
+    }
+  }
+}

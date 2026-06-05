@@ -1,0 +1,10 @@
+# Markdown docs
+*.md
+
+# Claude / AI assistant files
+.claude/
+CLAUDE.md
+.mcp.json
+
+# OS / editor cruft
+.DS_Store
