@@ -78,6 +78,7 @@
                   <div class="field"><label>Out of *</label><input type="number" id="m-max" required min="1" step="0.5" placeholder="100" /></div>
                 </div>
                 <div class="field"><label>Date</label><input type="date" id="m-date" /></div>
+                <div class="field"><label>Remarks</label><input type="text" id="m-remarks" placeholder="e.g. Good improvement; revise trigonometry" /></div>
                 <button class="btn btn--primary" style="width:100%; justify-content:center;">Save Marks</button>
               </form>
             </div>
@@ -87,8 +88,8 @@
               <h3>Recent Marks</h3>
               <div class="table-wrap">
                 <table class="table">
-                  <thead><tr><th>Date</th><th>Student</th><th>Test</th><th>Subject</th><th>Score</th><th></th></tr></thead>
-                  <tbody id="recent-body"><tr><td colspan="6" class="muted">Loading…</td></tr></tbody>
+                  <thead><tr><th>Date</th><th>Student</th><th>Test</th><th>Subject</th><th>Score</th><th>Remarks</th><th></th></tr></thead>
+                  <tbody id="recent-body"><tr><td colspan="7" class="muted">Loading…</td></tr></tbody>
                 </table>
               </div>
             </div>
@@ -117,6 +118,7 @@
           <div class="field"><label>Out of *</label><input type="number" id="em-max" required min="1" step="0.5" /></div>
         </div>
         <div class="field"><label>Date</label><input type="date" id="em-date" /></div>
+        <div class="field"><label>Remarks</label><input type="text" id="em-remarks" placeholder="Optional note for parents" /></div>
         <button class="btn btn--primary" style="width:100%; justify-content:center;">Save Changes</button>
       </form>
     </div>
@@ -161,6 +163,12 @@
       if (type === "ok") setTimeout(function(){ msg.innerHTML = ""; }, 4000);
     }
     function esc(v){ return String(v==null?"":v).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];}); }
+    const MONTHS = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+    function fmtDate(v){
+      const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(v || "");
+      if (!m) return v || "";
+      return parseInt(m[3],10) + " " + MONTHS[parseInt(m[2],10)-1] + " " + m[1];
+    }
 
     onAuthStateChanged(auth, async function (user) {
       if (!user) { window.location.replace("parent-login.html"); return; }
@@ -196,12 +204,14 @@
       body.innerHTML = recentMarks.length
         ? recentMarks.slice(0, 50).map(function (m) {
             const score = (m.obtained != null ? m.obtained : "—") + (m.max != null ? " / " + m.max : "");
-            return "<tr><td>" + esc(m.date) + "</td><td>" + esc(nameById[m.studentId] || m.studentId) +
-                   "</td><td>" + esc(m.testName) + "</td><td>" + esc(m.subject) + '</td><td class="score">' + esc(score) +
+            return "<tr><td>" + esc(fmtDate(m.date)) + "</td><td>" + esc(nameById[m.studentId] || m.studentId) +
+                   '</td><td class="truncate" title="' + esc(m.testName) + '">' + esc(m.testName) +
+                   "</td><td>" + esc(m.subject) + '</td><td class="score">' + esc(score) +
+                   '</td><td class="truncate" title="' + esc(m.remarks) + '">' + esc(m.remarks) +
                    '</td><td class="cell-action"><button class="tbl-edit" data-edit="' + m.id + '" title="Edit" aria-label="Edit">' + ICON_EDIT + '</button>' +
                    '<button class="tbl-del" data-del="' + m.id + '" title="Delete" aria-label="Delete">' + ICON_DEL + '</button></td></tr>';
           }).join("")
-        : '<tr><td colspan="6" class="muted">No marks yet.</td></tr>';
+        : '<tr><td colspan="7" class="muted">No marks yet.</td></tr>';
     }
 
     // ---- Searchable student picker ----
@@ -248,6 +258,7 @@
           obtained: Number(document.getElementById("m-obtained").value),
           max: Number(document.getElementById("m-max").value),
           date: document.getElementById("m-date").value || "",
+          remarks: document.getElementById("m-remarks").value.trim(),
           createdAt: serverTimestamp()
         });
         e.target.reset();
@@ -274,6 +285,8 @@
 
     // ---- Edit / Delete recent marks ----
     document.getElementById("recent-body").addEventListener("click", function (e) {
+      const trunc = e.target.closest("td.truncate");
+      if (trunc) { trunc.classList.toggle("is-open"); return; }
       const edit = e.target.closest("[data-edit]");
       const del = e.target.closest("[data-del]");
       if (edit) openEditMark(edit.getAttribute("data-edit"));
@@ -292,6 +305,7 @@
       document.getElementById("em-obtained").value = m.obtained != null ? m.obtained : "";
       document.getElementById("em-max").value = m.max != null ? m.max : "";
       document.getElementById("em-date").value = m.date || "";
+      document.getElementById("em-remarks").value = m.remarks || "";
       openModal("modal-edit-mark");
     }
 
@@ -312,7 +326,8 @@
           subject: document.getElementById("em-subject").value.trim(),
           obtained: Number(document.getElementById("em-obtained").value),
           max: Number(document.getElementById("em-max").value),
-          date: document.getElementById("em-date").value || ""
+          date: document.getElementById("em-date").value || "",
+          remarks: document.getElementById("em-remarks").value.trim()
         });
         closeModal(document.getElementById("modal-edit-mark"));
         flash("Marks updated.", "ok");

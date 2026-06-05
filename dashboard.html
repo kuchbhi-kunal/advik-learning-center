@@ -52,7 +52,7 @@
             <div class="table-wrap">
               <table class="table">
                 <thead>
-                  <tr><th>Date</th><th>Test</th><th>Subject</th><th>Score</th></tr>
+                  <tr><th>Date</th><th>Test</th><th>Subject</th><th>Score</th><th>Remarks</th></tr>
                 </thead>
                 <tbody id="marks-body"></tbody>
               </table>
@@ -125,10 +125,22 @@
           document.getElementById("marks-area").classList.add("hidden");
           document.getElementById("no-marks").classList.remove("hidden");
         } else {
+          const RMK_LIMIT = 80;
           body.innerHTML = rows.map(function (m) {
             const score = (m.obtained != null ? m.obtained : "—") + (m.max != null ? " / " + m.max : "");
-            return "<tr><td>" + esc(m.date) + "</td><td>" + esc(m.testName) +
-                   "</td><td>" + esc(m.subject) + '</td><td class="score">' + esc(score) + "</td></tr>";
+            const remark = m.remarks || "";
+            let remarkCell;
+            if (remark.length > RMK_LIMIT) {
+              const short = remark.slice(0, RMK_LIMIT).trim() + "…";
+              remarkCell = '<td class="rmk-cell"><span class="rmk-text">' + esc(short) + '</span>' +
+                           '<button type="button" class="rmk-toggle" data-short="' + esc(short) +
+                           '" data-full="' + esc(remark) + '">Show more</button></td>';
+            } else {
+              remarkCell = "<td>" + esc(remark) + "</td>";
+            }
+            return "<tr><td>" + esc(fmtDate(m.date)) + "</td><td>" + esc(m.testName) +
+                   "</td><td>" + esc(m.subject) + '</td><td class="score">' + esc(score) +
+                   "</td>" + remarkCell + "</tr>";
           }).join("");
         }
         reveal();
@@ -151,6 +163,23 @@
         return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
       });
     }
+    const MONTHS = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+    function fmtDate(v) {
+      const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(v || "");
+      if (!m) return v || "";
+      return parseInt(m[3],10) + " " + MONTHS[parseInt(m[2],10)-1] + " " + m[1];
+    }
+
+    // Show more / show less for long remarks
+    document.getElementById("marks-body").addEventListener("click", function (e) {
+      const btn = e.target.closest(".rmk-toggle");
+      if (!btn) return;
+      const span = btn.parentElement.querySelector(".rmk-text");
+      const open = btn.getAttribute("data-state") === "open";
+      span.textContent = open ? btn.getAttribute("data-short") : btn.getAttribute("data-full");
+      btn.textContent = open ? "Show more" : "Show less";
+      btn.setAttribute("data-state", open ? "closed" : "open");
+    });
   </script>
 </body>
 </html>
