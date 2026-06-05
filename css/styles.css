@@ -418,6 +418,31 @@ h1, h2, h3, h4 { font-family: var(--font-display); color: var(--sepia); line-hei
 .footer-bottom { border-top: 1px solid rgba(251,244,228,0.15); margin-top: 2.5rem; padding-top: 1.3rem; text-align: center; font-size: 0.85rem; color: rgba(251,244,228,0.55); }
 
 /* ============================================================
+   Instagram reels — centered on desktop, swipe slider on mobile
+   ============================================================ */
+.ig-reels {
+  display: flex; justify-content: center; flex-wrap: wrap; gap: 1rem;
+}
+.ig-reels > .instagram-media { max-width: 326px !important; min-width: 300px !important; }
+/* force all rendered embeds to one height (iframe clips the overflow) */
+.ig-reels .instagram-media,
+.ig-reels iframe.instagram-media-rendered {
+  height: 700px !important; min-height: 560px !important;
+  border-radius: 3px; overflow: hidden;
+}
+@media (max-width: 720px) {
+  .ig-reels {
+    flex-wrap: nowrap; justify-content: flex-start;
+    overflow-x: auto; -webkit-overflow-scrolling: touch;
+    scroll-snap-type: x mandatory;
+    gap: 1rem; padding-bottom: 1rem; margin: 0 -1.25rem; padding-left: 1.25rem; padding-right: 1.25rem;
+    scrollbar-width: none;
+  }
+  .ig-reels::-webkit-scrollbar { display: none; }
+  .ig-reels > .instagram-media { flex: 0 0 auto; scroll-snap-align: center; }
+}
+
+/* ============================================================
    Floating WhatsApp
    ============================================================ */
 .wa-float {
