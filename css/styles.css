@@ -144,8 +144,8 @@ h1, h2, h3, h4 { font-family: var(--font-display); color: var(--sepia); line-hei
 
 .nav-links { display: flex; align-items: center; gap: 1.6rem; }
 .nav-links a { font-weight: 600; color: var(--sepia); font-size: 0.98rem; position: relative; }
-.nav-links a.active::after,
-.nav-links a:hover::after {
+.nav-links a:not(.nav-cta).active::after,
+.nav-links a:not(.nav-cta):hover::after {
   content: ""; position: absolute; left: 0; right: 0; bottom: -6px; height: 2px; background: var(--gold);
 }
 .nav-links a.nav-cta { margin-left: 0.5rem; color: #fff; }
