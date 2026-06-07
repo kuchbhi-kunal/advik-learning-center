@@ -100,6 +100,93 @@ h2 { color: var(--kesari); }
   border: 1px solid var(--gold); opacity: 0.7;
 }
 
+/* Vision statement — large pull-quote with a saffron opening mark */
+.vision-quote {
+  font-family: var(--font-head); font-style: italic;
+  font-size: clamp(1.3rem, 3vw, 1.9rem); line-height: 1.55;
+  color: var(--sepia); text-align: center; max-width: 800px;
+  margin: 0 auto; padding: 0 1rem; position: relative;
+}
+.vision-quote::before {
+  content: "\201C"; display: block; font-family: var(--font-display);
+  font-size: 4rem; line-height: 0.6; color: var(--kesari); margin-bottom: 0.4rem;
+}
+
+/* Mission list — saffron-marked points */
+.mission-list { max-width: 780px; margin: 0 auto; display: grid; gap: 1rem; }
+.mission-list li { position: relative; padding-left: 2rem; line-height: 1.7; color: var(--ink); }
+.mission-list li::before {
+  content: "✦"; position: absolute; left: 0; top: 0.15em; color: var(--kesari); font-size: 0.95rem;
+}
+.mission-list strong { color: var(--sepia); }
+
+/* Founder — photo + bio */
+.founder {
+  display: grid; grid-template-columns: 300px 1fr; gap: 2.5rem;
+  align-items: start; max-width: 1000px; margin: 0 auto;
+}
+.founder-photo { text-align: center; position: sticky; top: 96px; }
+.founder-photo img {
+  width: 100%; aspect-ratio: 3 / 4; object-fit: cover; background: var(--cream-card);
+  border-radius: var(--radius); border: 1px solid var(--line); box-shadow: var(--shadow);
+}
+.founder-name { margin-top: 0.9rem; display: flex; flex-direction: column; gap: 2px; }
+.founder-name strong { font-family: var(--font-display); color: var(--sepia); font-size: 1.15rem; }
+.founder-name span { color: var(--gold-deep); font-size: 0.85rem; letter-spacing: 0.03em; }
+.founder-bio p { color: var(--ink); }
+/* at-a-glance credential chips */
+.founder-creds { display: flex; flex-wrap: wrap; gap: 0.6rem; margin: 0 0 1.6rem; padding: 0; list-style: none; }
+.founder-creds li {
+  display: inline-flex; align-items: center; gap: 0.45rem;
+  background: var(--cream-card); border: 1px solid var(--line); border-radius: 50px;
+  padding: 0.4rem 0.9rem; font-size: 0.85rem; font-weight: 600; color: var(--sepia); box-shadow: var(--shadow-sm);
+}
+.founder-creds li::before { content: "✦"; color: var(--kesari); font-size: 0.72rem; }
+/* decorative drop-cap on the opening paragraph */
+.founder-bio p:first-of-type::first-letter {
+  float: left; font-family: var(--font-display); font-weight: 700; color: var(--kesari);
+  font-size: 3.4rem; line-height: 0.8; padding: 0.1rem 0.6rem 0 0;
+}
+@media (max-width: 760px) {
+  .founder { grid-template-columns: 1fr; gap: 1.5rem; }
+  .founder-photo { position: static; }
+  .founder-photo img { max-width: 280px; margin: 0 auto; }
+}
+
+/* Core values — grid of cards */
+.values-grid {
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem;
+  max-width: 980px; margin: 0 auto;
+}
+.value-item {
+  display: flex; align-items: center; gap: 0.6rem;
+  background: var(--cream-card); border: 1px solid var(--line); border-radius: var(--radius);
+  padding: 1rem 1.1rem; box-shadow: var(--shadow-sm);
+  font-family: var(--font-display); font-weight: 600; color: var(--sepia); line-height: 1.3;
+}
+.value-icon { width: 26px; height: 26px; color: var(--kesari); flex-shrink: 0; }
+
+/* A.D.V.I.K. acronym row */
+.advik-acronym { display: flex; flex-wrap: wrap; justify-content: center; gap: 1.4rem 2rem; margin: 0 auto; }
+.advik-item { display: flex; flex-direction: column; align-items: center; gap: 0.35rem; min-width: 110px; }
+.advik-letter {
+  font-family: var(--font-display); font-size: 3.6rem; font-weight: 700; line-height: 1;
+  background: linear-gradient(100deg, var(--coffee) 35%, #e7c074 50%, var(--coffee) 65%);
+  background-size: 220% auto;
+  -webkit-background-clip: text; background-clip: text;
+  -webkit-text-fill-color: transparent; color: transparent;
+  animation: shimmer 3.5s linear infinite;
+}
+@keyframes shimmer { to { background-position: -220% center; } }
+.advik-word { font-family: var(--font-head); font-size: 1.1rem; font-weight: 600; color: var(--sepia); }
+@media (max-width: 560px) {
+  .advik-acronym { flex-direction: column; align-items: flex-start; gap: 0.9rem; max-width: 260px; }
+  .advik-item { flex-direction: row; align-items: center; gap: 0.9rem; min-width: 0; }
+  .advik-letter { font-size: 2.6rem; width: 1.3em; text-align: center; }
+}
+@media (max-width: 860px) { .values-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 480px) { .values-grid { grid-template-columns: 1fr; } }
+
 /* ---------- Buttons ---------- */
 .btn {
   display: inline-flex; align-items: center; gap: 0.5rem;
@@ -139,7 +226,7 @@ h2 { color: var(--kesari); }
   height: 76px;
 }
 .brand { display: flex; align-items: center; gap: 0.7rem; }
-.brand img { height: 52px; width: 52px; border-radius: 8px; object-fit: cover; }
+.brand img { height: 52px; width: 52px; border-radius: 50%; border: 2px solid var(--sepia); padding: 3px; background: var(--paper); object-fit: cover; }
 .brand-text { display: flex; flex-direction: column; line-height: 1; }
 .brand-text strong { font-family: var(--font-display); font-size: 1.15rem; color: var(--sepia); letter-spacing: 0.04em; }
 .brand-text small { font-size: 0.62rem; letter-spacing: 0.28em; text-transform: uppercase; color: var(--muted); margin-top: 3px; }
@@ -614,7 +701,8 @@ body.modal-open { overflow: hidden; }
 .reveal.in { opacity: 1; transform: none; }
 @media (prefers-reduced-motion: reduce) {
   .reveal { opacity: 1 !important; transform: none !important; transition: none !important; }
-  .hero-logo, .hero::before, .page-header::before { animation: none !important; }
+  .hero-logo, .hero::before, .page-header::before, .advik-letter { animation: none !important; }
+  .advik-letter { background-position: 50% center; }
 }
 
 /* ============================================================
