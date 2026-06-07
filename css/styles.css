@@ -14,6 +14,7 @@
   --coffee:         #7b4a2e;   /* heading brown  */
   --gold:           #b8860b;   /* burnt gold CTA */
   --gold-deep:      #9a6f0a;
+  --kesari:         #e2711d;   /* saffron headings */
   --muted:          #6b513a;
   --line:           #c9b489;   /* hairline borders */
   --cream-card:     #fcf7ea;
@@ -63,6 +64,7 @@ ul { padding: 0; list-style: none; }
 
 /* ---------- Typography ---------- */
 h1, h2, h3, h4 { font-family: var(--font-display); color: var(--sepia); line-height: 1.18; font-weight: 700; }
+h2 { color: var(--kesari); }
 .section-title { font-size: clamp(1.7rem, 3.5vw, 2.6rem); text-align: center; }
 .section-kicker {
   display: block; text-align: center; font-family: var(--font-body);
@@ -162,7 +164,7 @@ h1, h2, h3, h4 { font-family: var(--font-display); color: var(--sepia); line-hei
 .hero {
   position: relative; overflow: hidden; text-align: center; padding: 5rem 0 4.5rem;
   background:
-    radial-gradient(circle at 50% 0%, rgba(184, 134, 11, 0.12), transparent 55%),
+    radial-gradient(circle at 50% 0%, rgba(245, 130, 30, 0.16), transparent 55%),
     linear-gradient(180deg, var(--paper), var(--parchment));
   border-bottom: 1px solid var(--line);
 }
@@ -171,7 +173,7 @@ h1, h2, h3, h4 { font-family: var(--font-display); color: var(--sepia); line-hei
   content: ""; position: absolute; top: -260px; left: 50%; width: 760px; height: 760px;
   transform: translateX(-50%); pointer-events: none; opacity: 0.7;
   background:
-    repeating-conic-gradient(from 0deg at 50% 50%, rgba(124,84,4,0.16) 0deg 4deg, transparent 4deg 12deg);
+    repeating-conic-gradient(from 0deg at 50% 50%, rgba(245,130,30,0.22) 0deg 4deg, transparent 4deg 12deg);
   -webkit-mask-image: radial-gradient(circle, #000 30%, transparent 68%);
   mask-image: radial-gradient(circle, #000 30%, transparent 68%);
   animation: spin 90s linear infinite;
