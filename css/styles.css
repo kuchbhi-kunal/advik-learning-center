@@ -281,7 +281,7 @@ h2 { color: var(--kesari); }
   background: linear-gradient(180deg, var(--coffee), var(--sepia) 55%, var(--ink));
   -webkit-background-clip: text; background-clip: text; color: transparent;
 }
-.hero .sanskrit { font-family: var(--font-head); font-style: italic; font-size: 1.3rem; color: var(--gold-deep); margin-top: 0.5rem; }
+.hero .sanskrit { font-family: var(--font-head); font-style: italic; font-size: 1.7rem; color: #2e7d32; margin-top: 0.5rem; }
 .hero .tagline { font-size: 1.2rem; color: var(--muted); margin-top: 1rem; max-width: 640px; margin-left: auto; margin-right: auto; }
 .hero .hero-meta { display: flex; flex-wrap: wrap; gap: 0.6rem 1.4rem; justify-content: center; margin-top: 1.4rem; color: var(--sepia); font-weight: 600; }
 .hero .hero-meta span { display: inline-flex; align-items: center; gap: 0.4rem; }
