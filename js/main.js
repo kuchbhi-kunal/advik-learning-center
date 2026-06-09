@@ -44,10 +44,6 @@
     requestAnimationFrame(step);
   }
 
-  // --- Current year in footer ---
-  var yr = document.querySelectorAll("[data-year]");
-  yr.forEach(function (el) { el.textContent = new Date().getFullYear(); });
-
   // --- Scroll reveal (with staggered cascade among siblings) ---
   var revealSel = ".section-kicker, .section-title, .ornament, .lead, .card, .feature, " +
                   ".quote, .stat, .gallery-item, .cta-band, .form-card, .info-block, .map-embed, " +

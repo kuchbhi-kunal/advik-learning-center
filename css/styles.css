@@ -230,6 +230,8 @@ h2 { color: var(--kesari); }
 .btn--ghost:hover { background: var(--sepia); color: var(--paper); }
 .btn--light { background: var(--paper); color: var(--sepia); }
 .btn--light:hover { background: #fff; transform: translateY(-2px); }
+.btn--green { background: linear-gradient(180deg, #3a9b41, #2e7d32); color: #fff; box-shadow: 0 6px 18px rgba(46,125,50,0.32); }
+.btn--green:hover { color: #fff; transform: translateY(-2px); box-shadow: 0 10px 26px rgba(46,125,50,0.42); }
 
 /* ============================================================
    Header / Navbar
@@ -523,6 +525,13 @@ h2 { color: var(--kesari); }
 }
 .field textarea { resize: vertical; min-height: 120px; }
 .field-hidden { position: absolute; left: -5000px; }
+.form-section-title {
+  font-size: 1.1rem; color: var(--kesari); margin: 2rem 0 1rem;
+  padding-bottom: 0.5rem; border-bottom: 1px solid var(--line);
+}
+.form-section-title:first-child { margin-top: 0; }
+.form-check { display: flex; gap: 0.7rem; align-items: flex-start; color: var(--ink); font-size: 0.95rem; line-height: 1.5; }
+.form-check input { margin-top: 0.25rem; width: 18px; height: 18px; flex-shrink: 0; accent-color: var(--gold); }
 .field-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.1rem; }
 
 .info-block { margin-bottom: 1.6rem; display: flex; gap: 1rem; }
