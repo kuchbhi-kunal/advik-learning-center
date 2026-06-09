@@ -411,6 +411,11 @@ h2 { color: var(--kesari); }
   color: #fff; font-family: var(--font-display); font-size: 1.02rem; letter-spacing: 0.03em;
   background: linear-gradient(0deg, rgba(58,36,20,0.9), rgba(58,36,20,0.35) 60%, transparent);
 }
+/* Science lab equipment gallery */
+.lab-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.1rem; }
+.lab-grid .gallery-item { aspect-ratio: 1 / 1; }
+@media (max-width: 900px) { .lab-grid { grid-template-columns: repeat(3, 1fr); } }
+@media (max-width: 560px) { .lab-grid { grid-template-columns: repeat(2, 1fr); } }
 @media (max-width: 900px) {
   /* single column — every card stacked one below another */
   .gallery { grid-template-columns: 1fr; grid-template-rows: none; height: auto; }
