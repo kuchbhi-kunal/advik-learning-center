@@ -153,20 +153,11 @@ h2 { color: var(--kesari); }
 }
 
 /* Message from Guru Maa */
-.guru-photo {
-  display: block; width: 100%; max-width: 540px; margin: 0 auto 2.2rem;
-  aspect-ratio: 16 / 9; object-fit: cover;
+.guru-card {
+  display: block; width: 100%; max-width: 440px; margin: 0 auto;
+  aspect-ratio: 9 / 16; object-fit: cover;
   border-radius: var(--radius); border: 1px solid var(--line); box-shadow: var(--shadow);
 }
-.guru-message { max-width: 680px; margin: 0 auto; }
-.guru-message p { color: var(--ink); font-style: italic; line-height: 1.75; margin-bottom: 1rem; }
-.guru-verse {
-  text-align: center; font-style: normal !important; font-family: var(--font-head);
-  font-size: 1.3rem; line-height: 1.6; color: var(--kesari); margin: 1.8rem 0;
-}
-.guru-sign-img { display: block; width: 200px; max-width: 60%; margin: 1.5rem auto 0.2rem; }
-.guru-sign { text-align: center; font-family: var(--font-head); font-size: 1.15rem; }
-.guru-sign strong { color: var(--sepia); }
 
 /* Core values — grid of cards */
 .values-grid {
