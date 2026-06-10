@@ -44,11 +44,10 @@ body {
   background-image:
     url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.05'/%3E%3C/svg%3E"),
     radial-gradient(rgba(123, 74, 46, 0.035) 1px, transparent 1px),
-    radial-gradient(rgba(123, 74, 46, 0.022) 1px, transparent 1px),
-    radial-gradient(circle at 50% -10%, rgba(184,134,11,0.10), transparent 60%);
-  background-size: 140px 140px, 14px 14px, 22px 22px, 100% 900px;
-  background-position: 0 0, 0 0, 7px 11px, center top;
-  background-attachment: fixed, scroll, scroll, fixed;
+    radial-gradient(rgba(123, 74, 46, 0.022) 1px, transparent 1px);
+  background-size: 140px 140px, 14px 14px, 22px 22px;
+  background-position: 0 0, 0 0, 7px 11px;
+  background-attachment: fixed, scroll, scroll;
   -webkit-font-smoothing: antialiased;
 }
 /* subtle edge vignette for an aged-paper feel */
@@ -152,6 +151,22 @@ h2 { color: var(--kesari); }
   .founder-photo { position: static; }
   .founder-photo img { max-width: 280px; margin: 0 auto; }
 }
+
+/* Message from Guru Maa */
+.guru-photo {
+  display: block; width: 100%; max-width: 540px; margin: 0 auto 2.2rem;
+  aspect-ratio: 16 / 9; object-fit: cover;
+  border-radius: var(--radius); border: 1px solid var(--line); box-shadow: var(--shadow);
+}
+.guru-message { max-width: 680px; margin: 0 auto; }
+.guru-message p { color: var(--ink); font-style: italic; line-height: 1.75; margin-bottom: 1rem; }
+.guru-verse {
+  text-align: center; font-style: normal !important; font-family: var(--font-head);
+  font-size: 1.3rem; line-height: 1.6; color: var(--kesari); margin: 1.8rem 0;
+}
+.guru-sign-img { display: block; width: 200px; max-width: 60%; margin: 1.5rem auto 0.2rem; }
+.guru-sign { text-align: center; font-family: var(--font-head); font-size: 1.15rem; }
+.guru-sign strong { color: var(--sepia); }
 
 /* Core values — grid of cards */
 .values-grid {
