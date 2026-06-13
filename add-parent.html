@@ -58,17 +58,20 @@
             <div class="card admin-card">
               <h3>Add a Parent Account</h3>
               <p style="color:var(--muted); font-size:0.88rem; margin-bottom:1rem;">
-                First create the parent's login in Firebase Console → Authentication → Add user, then paste their <b>User UID</b> here to link them to a student.
+                Create the parent's login here — no Firebase Console needed. Share the email &amp; password you set with the parent so they can sign in.
               </p>
               <form id="link-form">
-                <div class="field"><label>Parent's User UID *</label><input type="text" id="l-uid" required placeholder="paste UID from Authentication" /></div>
+                <div class="field-grid">
+                  <div class="field"><label>Parent's email *</label><input type="email" id="l-email" required placeholder="parent@example.com" autocomplete="off" /></div>
+                  <div class="field"><label>Temporary password *</label><input type="text" id="l-pass" required minlength="6" placeholder="min 6 characters" autocomplete="off" /></div>
+                </div>
                 <div class="field"><label>Parent's name</label><input type="text" id="l-name" placeholder="e.g. Mr. Sharma" /></div>
                 <div class="field"><label>Parent's phone</label><input type="tel" id="l-phone" placeholder="10-digit mobile number" /></div>
                 <div class="field">
                   <label>Link to student *</label>
                   <select id="l-student" required><option value="" disabled selected>Select student</option></select>
                 </div>
-                <button class="btn btn--primary" style="width:100%; justify-content:center;">Link Parent</button>
+                <button class="btn btn--primary" style="width:100%; justify-content:center;">Create &amp; Link Parent</button>
               </form>
             </div>
 
@@ -93,13 +96,14 @@
   <div class="modal-overlay" id="modal-edit-parent">
     <div class="modal" role="dialog" aria-modal="true" aria-labelledby="ep-title">
       <div class="modal-head">
-        <div><h3 id="ep-title">Edit Parent</h3><p>Update the parent's name or which student they're linked to.</p></div>
+        <div><h3 id="ep-title">Edit Parent</h3><p>Update the parent's name, phone or which student they're linked to.</p></div>
         <button type="button" class="modal-close" data-close aria-label="Close">&times;</button>
       </div>
       <form id="edit-parent-form">
         <input type="hidden" id="ep-uid" />
         <div class="field"><label>Parent's name</label><input type="text" id="ep-name" placeholder="e.g. Mr. Sharma" /></div>
         <div class="field"><label>Parent's phone</label><input type="tel" id="ep-phone" placeholder="10-digit mobile number" /></div>
+        <div class="field"><label>Login email <small style="color:var(--muted); font-weight:400;">— can't be changed here</small></label><input type="email" id="ep-email" disabled /></div>
         <div class="field">
           <label>Linked student *</label>
           <select id="ep-student" required></select>
@@ -118,6 +122,7 @@
       </div>
       <dl class="detail-list">
         <div><dt>Name</dt><dd id="v-name">—</dd></div>
+        <div><dt>Email</dt><dd id="v-email">—</dd></div>
         <div><dt>Phone</dt><dd id="v-phone">—</dd></div>
         <div><dt>Student</dt><dd id="v-student">—</dd></div>
       </dl>
@@ -143,11 +148,16 @@
   </div>
 
   <script type="module">
-    import { auth, db } from "./js/firebase-config.js";
-    import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import { app, auth, db } from "./js/firebase-config.js";
+    import { onAuthStateChanged, signOut, getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
     import {
       doc, getDoc, setDoc, updateDoc, deleteDoc, collection, getDocs
     } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+    // Secondary app — lets us create a parent's auth account WITHOUT signing the admin out.
+    const secondaryApp = initializeApp(app.options, "ParentCreator");
+    const secondaryAuth = getAuth(secondaryApp);
 
     const loading = document.getElementById("loading");
     const content = document.getElementById("content");
@@ -233,21 +243,36 @@
         : '<tr><td colspan="3" class="muted">No parents linked yet.</td></tr>';
     }
 
-    // Link parent
+    // Create the parent's login + link to a student
     document.getElementById("link-form").addEventListener("submit", async function (e) {
       e.preventDefault();
+      const email = document.getElementById("l-email").value.trim();
+      const pass = document.getElementById("l-pass").value;
+      const studentId = document.getElementById("l-student").value;
+      if (!studentId) { flash("Please select a student to link.", "error"); return; }
       try {
-        const uid = document.getElementById("l-uid").value.trim();
+        // 1) Create the auth account on the secondary app (admin stays signed in here).
+        const cred = await createUserWithEmailAndPassword(secondaryAuth, email, pass);
+        const uid = cred.user.uid;
+        // 2) Create their profile doc (written as the admin, on the primary app).
         await setDoc(doc(db, "users", uid), {
           role: "parent",
           name: document.getElementById("l-name").value.trim(),
           phone: document.getElementById("l-phone").value.trim(),
-          studentId: document.getElementById("l-student").value
+          email: email,
+          studentId: studentId
         }, { merge: true });
+        // 3) Sign the new user out of the secondary app.
+        await signOut(secondaryAuth);
         e.target.reset();
-        flash("Parent linked successfully.", "ok");
+        flash("Parent account created and linked. Share the email &amp; password with them.", "ok");
         await loadParents();
-      } catch (err) { flash("Could not link parent: " + err.message, "error"); }
+      } catch (err) {
+        const m = err.code === "auth/email-already-in-use"
+          ? "That email already has an account. Use a different email, or link the existing account."
+          : err.message;
+        flash("Could not create parent: " + m, "error");
+      }
     });
 
     // View / Edit / Delete (delegated)
@@ -267,6 +292,7 @@
       currentViewUid = uid;
       const s = students.find(function (x) { return x.id === p.studentId; });
       document.getElementById("v-name").textContent = p.name || "—";
+      document.getElementById("v-email").textContent = p.email || "—";
       document.getElementById("v-phone").textContent = p.phone || "—";
       document.getElementById("v-student").textContent = s ? (s.name + (s.class ? " (Class " + s.class + ")" : "")) : (p.studentId || "—");
       openModal("modal-view-parent");
@@ -281,6 +307,7 @@
       const p = parents.find(function (x) { return x.uid === uid; });
       if (!p) return;
       document.getElementById("ep-uid").value = p.uid;
+      document.getElementById("ep-email").value = p.email || "";
       document.getElementById("ep-name").value = p.name || "";
       document.getElementById("ep-phone").value = p.phone || "";
       document.getElementById("ep-student").innerHTML = studentOptionsHtml(p.studentId);
