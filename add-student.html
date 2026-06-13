@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Manage Students — Advik Learning Centre</title>
+  <title>Manage Students, Advik Learning Centre</title>
   <meta name="robots" content="noindex" />
   <meta name="theme-color" content="#3a2414" />
   <link rel="icon" href="assets/advik-logo.png" />
@@ -17,7 +17,6 @@
   <header class="site-header">
     <div class="container nav">
       <a class="brand" href="index.html">
-        <img src="assets/advik-logo.png" alt="Advik Learning Centre logo" />
         <span class="brand-text"><strong>ADVIK</strong><small>Admin Panel</small></span>
       </a>
       <nav class="nav-links">
@@ -45,7 +44,7 @@
             <div>
               <span class="section-kicker" style="text-align:left;">Administration</span>
               <h1>Manage Students</h1>
-              <p class="muted">Add new students, or edit and remove existing ones.</p>
+              <p class="muted">Add new students or edit and remove existing ones.</p>
             </div>
             <a href="admin.html" class="btn btn--ghost">← Back to Marks</a>
           </div>
@@ -66,7 +65,7 @@
                 <div class="field">
                   <label>Course</label>
                   <select id="s-course">
-                    <option value="" selected>— Select course —</option>
+                    <option value="" selected>,  Select course, </option>
                     <option>School Tuition (6–12)</option>
                     <option>JEE Preparation</option>
                     <option>NEET Preparation</option>
@@ -98,7 +97,7 @@
   <div class="modal-overlay" id="modal-edit-student">
     <div class="modal" role="dialog" aria-modal="true" aria-labelledby="es-title">
       <div class="modal-head">
-        <div><h3 id="es-title">Edit Student</h3><p>Update details — e.g. when the student moves up a grade.</p></div>
+        <div><h3 id="es-title">Edit Student</h3><p>Update details, e.g. when the student moves up a grade.</p></div>
         <button type="button" class="modal-close" data-close aria-label="Close">&times;</button>
       </div>
       <form id="edit-student-form">
@@ -111,7 +110,7 @@
         <div class="field">
           <label>Course</label>
           <select id="es-course">
-            <option value="">— Select course —</option>
+            <option value="">,  Select course, </option>
             <option>School Tuition (6–12)</option>
             <option>JEE Preparation</option>
             <option>NEET Preparation</option>
@@ -201,7 +200,7 @@
       const body = document.getElementById("students-body");
       body.innerHTML = students.length
         ? students.map(function (s) {
-            return "<tr><td>" + esc(s.name) + "</td><td>" + esc(s.class||"—") + "</td><td>" + esc(s.rollNo||"—") + "</td><td>" + esc(s.course||"—") +
+            return "<tr><td>" + esc(s.name) + "</td><td>" + esc(s.class||"-") + "</td><td>" + esc(s.rollNo||"-") + "</td><td>" + esc(s.course||"-") +
                    '</td><td class="cell-action"><button class="tbl-edit" data-edit="' + s.id + '" title="Edit" aria-label="Edit">' + ICON_EDIT + '</button>' +
                    '<button class="tbl-del" data-del="' + s.id + '" title="Delete" aria-label="Delete">' + ICON_DEL + '</button></td></tr>';
           }).join("")

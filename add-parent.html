@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Manage Parents — Advik Learning Centre</title>
+  <title>Manage Parents, Advik Learning Centre</title>
   <meta name="robots" content="noindex" />
   <meta name="theme-color" content="#3a2414" />
   <link rel="icon" href="assets/advik-logo.png" />
@@ -17,7 +17,6 @@
   <header class="site-header">
     <div class="container nav">
       <a class="brand" href="index.html">
-        <img src="assets/advik-logo.png" alt="Advik Learning Centre logo" />
         <span class="brand-text"><strong>ADVIK</strong><small>Admin Panel</small></span>
       </a>
       <nav class="nav-links">
@@ -45,7 +44,7 @@
             <div>
               <span class="section-kicker" style="text-align:left;">Administration</span>
               <h1>Manage Parents</h1>
-              <p class="muted">Link parent accounts to students, or edit and remove them.</p>
+              <p class="muted">Link parent accounts to students or edit and remove them.</p>
             </div>
             <a href="admin.html" class="btn btn--ghost">← Back to Marks</a>
           </div>
@@ -58,7 +57,7 @@
             <div class="card admin-card">
               <h3>Add a Parent Account</h3>
               <p style="color:var(--muted); font-size:0.88rem; margin-bottom:1rem;">
-                Create the parent's login here — no Firebase Console needed. Share the email &amp; password you set with the parent so they can sign in.
+                Create the parent's login here, no Firebase Console needed. Share the email &amp; password you set with the parent so they can sign in.
               </p>
               <form id="link-form">
                 <div class="field-grid">
@@ -103,7 +102,7 @@
         <input type="hidden" id="ep-uid" />
         <div class="field"><label>Parent's name</label><input type="text" id="ep-name" placeholder="e.g. Mr. Sharma" /></div>
         <div class="field"><label>Parent's phone</label><input type="tel" id="ep-phone" placeholder="10-digit mobile number" /></div>
-        <div class="field"><label>Login email <small style="color:var(--muted); font-weight:400;">— can't be changed here</small></label><input type="email" id="ep-email" disabled /></div>
+        <div class="field"><label>Login email <small style="color:var(--muted); font-weight:400;">,  can't be changed here</small></label><input type="email" id="ep-email" disabled /></div>
         <div class="field">
           <label>Linked student *</label>
           <select id="ep-student" required></select>
@@ -121,10 +120,10 @@
         <button type="button" class="modal-close" data-close aria-label="Close">&times;</button>
       </div>
       <dl class="detail-list">
-        <div><dt>Name</dt><dd id="v-name">—</dd></div>
-        <div><dt>Email</dt><dd id="v-email">—</dd></div>
-        <div><dt>Phone</dt><dd id="v-phone">—</dd></div>
-        <div><dt>Student</dt><dd id="v-student">—</dd></div>
+        <div><dt>Name</dt><dd id="v-name">, </dd></div>
+        <div><dt>Email</dt><dd id="v-email">, </dd></div>
+        <div><dt>Phone</dt><dd id="v-phone">, </dd></div>
+        <div><dt>Student</dt><dd id="v-student">, </dd></div>
       </dl>
       <div style="display:flex; gap:0.7rem; justify-content:flex-end; margin-top:1.2rem;">
         <button type="button" class="btn btn--ghost" data-close>Close</button>
@@ -155,7 +154,7 @@
       doc, getDoc, setDoc, updateDoc, deleteDoc, collection, getDocs
     } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-    // Secondary app — lets us create a parent's auth account WITHOUT signing the admin out.
+    // Secondary app, lets us create a parent's auth account WITHOUT signing the admin out.
     const secondaryApp = initializeApp(app.options, "ParentCreator");
     const secondaryAuth = getAuth(secondaryApp);
 
@@ -235,8 +234,8 @@
       const body = document.getElementById("parents-body");
       body.innerHTML = parents.length
         ? parents.map(function (p) {
-            return '<tr><td><button class="row-link" data-view="' + p.uid + '">' + esc(p.name || "—") + "</button></td>" +
-                   "<td>" + esc(nameById[p.studentId] || p.studentId || "—") +
+            return '<tr><td><button class="row-link" data-view="' + p.uid + '">' + esc(p.name || "-") + "</button></td>" +
+                   "<td>" + esc(nameById[p.studentId] || p.studentId || "-") +
                    '</td><td class="cell-action"><button class="tbl-edit" data-edit="' + p.uid + '" title="Edit" aria-label="Edit">' + ICON_EDIT + '</button>' +
                    '<button class="tbl-del" data-del="' + p.uid + '" title="Delete" aria-label="Delete">' + ICON_DEL + '</button></td></tr>';
           }).join("")
@@ -269,7 +268,7 @@
         await loadParents();
       } catch (err) {
         const m = err.code === "auth/email-already-in-use"
-          ? "That email already has an account. Use a different email, or link the existing account."
+          ? "That email already has an account. Use a different email or link the existing account."
           : err.message;
         flash("Could not create parent: " + m, "error");
       }
@@ -291,10 +290,10 @@
       if (!p) return;
       currentViewUid = uid;
       const s = students.find(function (x) { return x.id === p.studentId; });
-      document.getElementById("v-name").textContent = p.name || "—";
-      document.getElementById("v-email").textContent = p.email || "—";
-      document.getElementById("v-phone").textContent = p.phone || "—";
-      document.getElementById("v-student").textContent = s ? (s.name + (s.class ? " (Class " + s.class + ")" : "")) : (p.studentId || "—");
+      document.getElementById("v-name").textContent = p.name || ", ";
+      document.getElementById("v-email").textContent = p.email || ", ";
+      document.getElementById("v-phone").textContent = p.phone || ", ";
+      document.getElementById("v-student").textContent = s ? (s.name + (s.class ? " (Class " + s.class + ")" : "")) : (p.studentId || "-");
       openModal("modal-view-parent");
     }
     document.getElementById("v-edit").addEventListener("click", function () {
@@ -316,7 +315,7 @@
 
     function confirmDelete(uid) {
       const p = parents.find(function (x) { return x.uid === uid; });
-      askConfirm('Remove parent "' + (p ? p.name : "") + '"? This unlinks them from the student. (Their login still exists in Firebase Authentication — delete it there too if needed.)', async function () {
+      askConfirm('Remove parent "' + (p ? p.name : "") + '"? This unlinks them from the student. (Their login still exists in Firebase Authentication, delete it there too if needed.)', async function () {
         try {
           await deleteDoc(doc(db, "users", uid));
           flash("Parent removed.", "ok");

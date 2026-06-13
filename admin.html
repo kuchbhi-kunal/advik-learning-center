@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Admin Panel — Advik Learning Centre</title>
+  <title>Admin Panel, Advik Learning Centre</title>
   <meta name="robots" content="noindex" />
   <meta name="theme-color" content="#3a2414" />
   <link rel="icon" href="assets/advik-logo.png" />
@@ -17,7 +17,6 @@
   <header class="site-header">
     <div class="container nav">
       <a class="brand" href="index.html">
-        <img src="assets/advik-logo.png" alt="Advik Learning Centre logo" />
         <span class="brand-text"><strong>ADVIK</strong><small>Admin Panel</small></span>
       </a>
       <nav class="nav-links">
@@ -203,7 +202,7 @@
       const body = document.getElementById("recent-body");
       body.innerHTML = recentMarks.length
         ? recentMarks.slice(0, 50).map(function (m) {
-            const score = (m.obtained != null ? m.obtained : "—") + (m.max != null ? " / " + m.max : "");
+            const score = (m.obtained != null ? m.obtained : "-") + (m.max != null ? " / " + m.max : "");
             return "<tr><td>" + esc(fmtDate(m.date)) + "</td><td>" + esc(nameById[m.studentId] || m.studentId) +
                    '</td><td class="truncate" title="' + esc(m.testName) + '">' + esc(m.testName) +
                    "</td><td>" + esc(m.subject) + '</td><td class="score">' + esc(score) +

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>My Dashboard — Advik Learning Centre</title>
+  <title>My Dashboard, Advik Learning Centre</title>
   <meta name="robots" content="noindex" />
   <meta name="theme-color" content="#3a2414" />
   <link rel="icon" href="assets/advik-logo.png" />
@@ -17,7 +17,6 @@
   <header class="site-header">
     <div class="container nav">
       <a class="brand" href="index.html">
-        <img src="assets/advik-logo.png" alt="Advik Learning Centre logo" />
         <span class="brand-text"><strong>ADVIK</strong><small>Learning Centre</small></span>
       </a>
       <nav class="nav-links">
@@ -93,7 +92,7 @@
         }
         const profile = userSnap.data();
 
-        // Admins don't use the parent dashboard — send them straight to the admin panel.
+        // Admins don't use the parent dashboard, send them straight to the admin panel.
         if (profile.role === "admin") { window.location.replace("admin.html"); return; }
 
         const studentId = profile.studentId;
@@ -109,7 +108,7 @@
         if (studentSnap.exists()) {
           const s = studentSnap.data();
           document.getElementById("student-meta").textContent =
-            "Student: " + (s.name || "—") + (s.class ? "  ·  Class " + s.class : "") +
+            "Student: " + (s.name || "-") + (s.class ? "  ·  Class " + s.class : "") +
             (s.rollNo ? "  ·  Roll " + s.rollNo : "") + (s.course ? "  ·  " + s.course : "");
         }
 
@@ -127,7 +126,7 @@
         } else {
           const RMK_LIMIT = 80;
           body.innerHTML = rows.map(function (m) {
-            const score = (m.obtained != null ? m.obtained : "—") + (m.max != null ? " / " + m.max : "");
+            const score = (m.obtained != null ? m.obtained : "-") + (m.max != null ? " / " + m.max : "");
             const remark = m.remarks || "";
             let remarkCell;
             if (remark.length > RMK_LIMIT) {
